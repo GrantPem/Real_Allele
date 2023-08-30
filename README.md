@@ -1,10 +1,10 @@
 # allelinatorV5
--Uses biopython version 1.81
--This script takes a FASTA file and reports the alleles 
--The script assumes that the input file will be named in this format
-AQ01_01.fasta (2 fields with underscores is important)
--The script will sort and organizers via the frequency of an allele present in the fasta.
--a command will use the TSV dictionary file an apply the previous allele naming scheme to the new fasta file keeping the allele's defined in the dictionary uniform. 
+-Uses biopython version 1.81  
+-This script takes a FASTA file and reports the alleles   
+-The script assumes that the input file will be named in this format  
+AQ01_01.fasta (2 fields with underscores is important)  
+-The script will sort and organizers via the frequency of an allele present in the fasta.  
+-a command will use the TSV dictionary file an apply the previous allele naming scheme to the new fasta file keeping the allele's defined in the dictionary uniform.   
 -The sequences within the file also need to be named to this convention:
  RHIMI-ARA13-xx-DN-020-JB_S86_17441 or 
 "RHIMI-", "-xx-DN-020-JB", "-xx-VE-020-JB" will be removed
