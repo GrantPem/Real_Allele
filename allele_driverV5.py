@@ -237,11 +237,11 @@ if __name__ == "__main__":
                      help="input FASTA file to filter [REQUIRED]",
                      type="string",action="callback",callback=test_file)
     parser.add_option("-c","--min_cov",dest="min_cov",
-                     help="filter under minimum coverage; defaults to 2",
-                     type="int",action="store",default=2)
+                     help="filter under minimum coverage; defaults to 10",
+                     type="int",action="store",default=10)
     parser.add_option("-p","--proportion",dest="proportion",
-                     help="reads under this proportion will be filtered; defaults to 0.3",
-                     type="float",action="store",default=0.3)
+                     help="reads under this proportion will be filtered; defaults to 0.5",
+                     type="float",action="store",default=0.5)
     parser.add_option("-a","--alleles",dest="alleles",
                      help="TSV file of seuqence'\tprevious_allele_number",
                      type="string",action="store",default="NULL")
