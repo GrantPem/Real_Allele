@@ -18,6 +18,6 @@ python allele_driver.py -f TEST_V1.fasta
   
 -Then you would run the new file from the same locus, using the allele file produced in the first script  
 python allele_driver.py -f TEST_V2.fasta -a TEST_V1_alleles.tsv  
-  
-  
+
+      
 Help command `python allele_driverV5.py -h`
