@@ -16,7 +16,7 @@ AQ01_01.fasta (2 fields with underscores is important)
  ARA13 is the sample name  
  17441 is the read count    
   
-- The parameters choose the sample with the highest read count and any of the duplicate samples will be removed if the read count is below the set parameter (e.g., multiple version of the same sample with a read count below 50% will be deleted.)  
+- The parameters finds the sample with the highest read count and any of the duplicate samples will be removed if the read count is below the set parameter (e.g., multiple version of the same sample with a read count below 50% will be deleted.)  
 This assumes 3 fields, all separated by "_" with the last field being the read count  
 
 -Test files are included with the repository. First you would run the script on an initial file:  
