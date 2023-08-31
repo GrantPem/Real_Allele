@@ -6,9 +6,9 @@
 -The script assumes that the input file will be named in this format  
 AQ01_01.fasta (2 fields with underscores is important)    
   
--The script will sort and organizers via the frequency of an allele present in the fasta.  
+-The script will sort and organize by the frequency of an allele present in the fasta.  
   
--a command will use the TSV dictionary file an apply the previous allele naming scheme to the new fasta file keeping the allele's defined in the dictionary uniform. 
+--a command will use the TSV dictionary file an apply the previous allele naming scheme to the new fasta file keeping the allele's defined in the dictionary uniform. 
   
 -The sequences within the file also need to be named to this convention:  
  RHIMI-ARA13-xx-DN-020-JB_S86_17441 or   
@@ -16,7 +16,7 @@ AQ01_01.fasta (2 fields with underscores is important)
  ARA13 is the sample name  
  17441 is the read count    
   
-The parameters choose the sample with the highest read count and any of the duplicate samples will be removed if the read count is below the parameter (e.g., multiple version of the same sample below 50% will be deleted.)  
+- The parameters choose the sample with the highest read count and any of the duplicate samples will be removed if the read count is below the set parameter (e.g., multiple version of the same sample with a read count below 50% will be deleted.)  
 This assumes 3 fields, all separated by "_" with the last field being the read count  
 
 -Test files are included with the repository. First you would run the script on an initial file:  
