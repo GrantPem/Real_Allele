@@ -21,7 +21,7 @@ This assumes 3 fields, all separated by "_" with the last field being the read c
 
 - The output sequence will look like this:
 ARA13_AQP1_E0101_17441_A1  
-The sample is renamed to fit the new naming scheme of "sample_Gene_Exon_Readcount_Allele".  
+The remaining sample after the filtration step are renamed to fit the new naming scheme of "sample_Gene_Exon_Readcount_Allele".  
 The dictionary tsv file will have all the alleles defined, the allele with the most frequency will be at the top of the dictionary and named "Allele 1". 
   
 -Test files are included with the repository. First you would run the script on an initial file:  
