@@ -1,4 +1,4 @@
-# allelinatorV5
+# Real_Allele
 -Uses biopython version 1.81    
   
 -This script takes a FASTA file and reports the alleles     
