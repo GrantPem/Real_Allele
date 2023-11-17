@@ -80,13 +80,14 @@ def parse_fasta_by_coverage(in_fasta, min_cov):
                 errorPrint("Invalid header format: %s" % record.id)
             elif header_fields[2] == "":
                 errorPrint("Empty coverage value in header: %s" % record.id)
-            elif int(header_fields[2]) < min_cov:
+            elif header_fields[2].isdigit() and int(header_fields[2]) < min_cov:
                 failed_records.append(record.id)
-            else:
+            elif "CONSENSUS" not in record.id:  # Check for "CONSENSUS" in the header
                 passing_records.append(record.id)
     if len(failed_records) > 0:
         logPrint("%s records were below %sX and will be filtered" % (len(failed_records), str(min_cov)))
     return passing_records
+
 
 def parse_zygosity(in_fasta,passing_records,proportion):
     passing = []
@@ -253,7 +254,3 @@ if __name__ == "__main__":
             parser.print_help()
             exit(-1)
     main(options.fasta,options.min_cov,options.proportion,options.alleles)
-
-
-
-
