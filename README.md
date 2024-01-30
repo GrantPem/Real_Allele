@@ -1,10 +1,10 @@
 # Real_Allele
 -Uses biopython version 1.81    
   
--This script takes a FASTA file and reports the alleles     
+-This script takes a consensus FASTA file for any gene and reports the alleles  
   
 -The script assumes that the input file will be named in this format  
-gene_01.fasta (2 fields with underscores is important)    
+Gene_Exon.fasta (A minimum of 2 fields with underscores is required)    
   
 -The script will sort and organize by the frequency of an allele present in the fasta.  
   
@@ -21,7 +21,7 @@ This assumes 3 fields, all separated by "_" with the last field being the read c
 
 - The output name will have 5 elements:
 ARA13_AQP1_E0101_17441_A1  
-The remaining sample after the filtration step are renamed to fit the new naming scheme of "sample_Gene_Exon_Readcount_Allele".  
+The remaining sample after the filtration step are renamed to fit the new naming scheme of "Sample_Gene_Exon_Readcount_Allele".  
 The dictionary tsv file will list all defined alleles, the allele with the most frequency will be at the top of the dictionary and named "Allele 1". 
   
 -Test files are included with the repository. First you would run the script on an initial file:  
