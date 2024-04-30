@@ -207,7 +207,7 @@ def assign_alleles(fasta, allele_file, allele_list, passing_records):
                     # This indicates that the allele has not been seen before
                     # I will need to overwrite the existing alleles file
                 #new_header = name_fields[0].replace("RHIMI-", "").replace("-xx-DN-020-JB", "").replace("-xx-VE-020-JB", "") + "_" + file_name + "_" + name_fields[2] + "_A" + str(allele)
-                new_header = "_".join(name_fields[:-1]) + "_" + "_" + "A" + str(allele) + name_fields[-1] +
+                new_header = "_".join(name_fields[:-1]) + "_" + "A" + str(allele) + name_fields[-1]
                 # From above, the locus should be the file_name
                 #From above, the locus should be the file_name
                 #Write the new file
