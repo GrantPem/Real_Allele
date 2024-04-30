@@ -1,5 +1,3 @@
-#This script is designed for a wider range of naming schemes, as long as the read count appears at the end of the last underscore at the end of the header then this script will work.
-
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
@@ -209,7 +207,7 @@ def assign_alleles(fasta, allele_file, allele_list, passing_records):
                     # This indicates that the allele has not been seen before
                     # I will need to overwrite the existing alleles file
                 #new_header = name_fields[0].replace("RHIMI-", "").replace("-xx-DN-020-JB", "").replace("-xx-VE-020-JB", "") + "_" + file_name + "_" + name_fields[2] + "_A" + str(allele)
-                new_header = "_".join(name_fields[0:-1])+"_"+file_name+"_A"+str(allele)
+                new_header = "_".join(name_fields[:-1]) + "_" + "_" + "A" + str(allele) + name_fields[-1] +
                 # From above, the locus should be the file_name
                 #From above, the locus should be the file_name
                 #Write the new file
