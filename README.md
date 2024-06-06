@@ -1,8 +1,8 @@
 # Real_Allele
 -Uses biopython version 1.81
 
-- The Real_Allele Script is designed for data sets as long as it formatted in the specifc ways listed below, Allele_Driver is the script used for the manuscript listed below.
-
+-The Real_Allele Script is designed for data sets as long as they are formatted in the specific ways listed below. Allele_Driver is the script used for the manuscript listed below.
+  
 -This script takes a consensus FASTA file for any gene and reports the alleles
 
   
