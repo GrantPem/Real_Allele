@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#Results in a fasta that goves a total count of sequences for each Allele.
+
 """
 Created on Wed Jun  7 14:27:53 2023
 
