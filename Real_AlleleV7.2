@@ -12,7 +12,6 @@ from optparse import OptionParser
 import os
 import collections
 import time
-import csv
 
 try:
     from Bio import SeqIO
@@ -62,7 +61,7 @@ def removeRecursiveMsg(msg):
     else:
         return msg
 
-#This function tests that required files are actually present
+# This function tests that required files are actually present
 def test_file(option, opt_str, value, parser):
     try:
         with open(value): setattr(parser.values, option.dest, value)
@@ -88,47 +87,46 @@ def parse_fasta_by_coverage(in_fasta, min_cov):
         logPrint("%s records were below %sX and will be filtered" % (len(failed_records), str(min_cov)))
     return passing_records
 
-def parse_zygosity(in_fasta,passing_records,proportion):
+def parse_zygosity(in_fasta, passing_records, proportion):
     passing = []
     sample_dict = {}
-    #Parse through the FASTA again and create a dictionary
+    # Parse through the FASTA again and create a dictionary
     with open(in_fasta) as my_fasta:
-        for record in SeqIO.parse(my_fasta,"fasta"):
-            #The sample name will be in the first field
+        for record in SeqIO.parse(my_fasta, "fasta"):
+            # The sample name will be in the first field
             header_fields = record.id.split("_")
-            #Only look at sequences that have passed the first filter
+            # Only look at sequences that have passed the first filter
             if record.id in passing_records:
-                #This will create a dictionary of sample: all_associated_coverages
+                # This will create a dictionary of sample: all_associated_coverages
                 try:
-                    #Change header_fields[2] to header_fields[-1]
-                    #What if I change the name to include everything before the first underscore?
+                    # Change header_fields[2] to header_fields[-1]
+                    # What if I change the name to include everything before the first underscore?
                     sample_dict["_".join(header_fields[0:-1])].append(int(header_fields[-1]))
                 except KeyError:
                     sample_dict["_".join(header_fields[0:-1])] = [int(header_fields[-1])]
-    #print(sample_dict)
-    #Iterate through the dictionary
-    for k,v in sample_dict.items():
-        values = sorted(v,reverse=True)
-        #I assume this is unlikely, but if a sample is only present once, keep it
+    # Iterate through the dictionary
+    for k, v in sample_dict.items():
+        values = sorted(v, reverse=True)
+        # If a sample is only present once, keep it
         if len(values) == 1:
             for value in v:
-                passing.append(k+"_"+str(value))
+                passing.append(k + "_" + str(value))
         else:
-            #This only keeps the two largest values in a list
+            # This only keeps the two largest values in a list
             kept_values = values[:2]
-            #Here I divide the large value by the small value
-            if float(kept_values[1]/kept_values[0])>=proportion:
-                #I want to keep the entire sample name for subsequent filtering
-                passing.append(k+"_"+str(kept_values[0]))
-                #Here I will also keep the second read as it has passed the proportion
-                passing.append(k+"_"+str(kept_values[1]))
-            #Now we need to analyze the case where the proportion filter is failed
-            elif float(kept_values[1]/kept_values[0])<proportion:
-                #In this case, I just want to keep the most common one
-                passing.append(k+"_"+str(kept_values[0]))
-    #I will now find differences between the two lists and report how many were filtered
+            # Divide the large value by the small value
+            if float(kept_values[1] / kept_values[0]) >= proportion:
+                # Keep the entire sample name for subsequent filtering
+                passing.append(k + "_" + str(kept_values[0]))
+                # Also keep the second read as it has passed the proportion
+                passing.append(k + "_" + str(kept_values[1]))
+            # Analyze the case where the proportion filter is failed
+            elif float(kept_values[1] / kept_values[0]) < proportion:
+                # Keep the most common one
+                passing.append(k + "_" + str(kept_values[0]))
+    # Find differences between the two lists and report how many were filtered
     diffs = set(passing_records).difference(set(passing))
-    if len(diffs)>0:
+    if len(diffs) > 0:
         logPrint("%s samples failed the proportion filter and will be removed" % len(diffs))
     return passing
 
@@ -145,114 +143,84 @@ def get_alleles(passing_records, fasta_file):
     for record_id in passing_records:
         sequence = get_sequence_from_id(record_id, fasta_file)
         sequences.append(sequence)
-    #This creates a dictionary of sequence and count_number
+    # This creates a dictionary of sequence and count_number
     frequency = collections.Counter(sequences)
-    #Sort the dictionary by value in decending order: most common element is listed first
-    sorted_frequency = sorted(frequency.items(), key=lambda x:x[1], reverse=True)
-    #returns this dictionary to be used later
+    # Sort the dictionary by value in descending order: most common element is listed first
+    sorted_frequency = sorted(frequency.items(), key=lambda x: x[1], reverse=True)
+    # Returns this dictionary to be used later
     return sorted_frequency
 
 def assign_alleles(fasta, allele_file, allele_list, passing_records):
-    # Create a dictionary for sequence counts
-    sequence_counts = collections.Counter()
+    # This dictionary will store allele sequences and their frequencies
+    allele_dict = {item[0]: item[1] for item in allele_list}
 
-    # Count the sequences in passing_records
-    for record_id in passing_records:
-        sequence = get_sequence_from_id(record_id, fasta)
-        sequence_counts[sequence] += 1
+    # Generate a dictionary of allele counts
+    allele_count_dict = {item[0]: index + 1 for index, item in enumerate(allele_list)}
 
     file_name = os.path.basename(fasta).strip(".fasta")
 
-    # This list will include the previous alleles where necessary
-    previous_allele_numbers = []
-
     if "NULL" in allele_file:
-        allele_dict = {}
-        # Write the alleles in terms of order
-        alleles_out = open("%s_alleles.tsv" % file_name, "w")
-        for item in allele_list:
-            allele_dict[item[0]] = sequence_counts[item[0]]
-            alleles_out.write(item[0] + "\t" + str(sequence_counts[item[0]]) + "\n")
-        alleles_out.close()
+        # Write the alleles and their counts to the TSV file
+        with open("%s_alleles.tsv" % file_name, "w") as alleles_out:
+            for sequence, count in allele_list:
+                alleles_out.write(sequence + "\t" + str(count) + "\n")
     else:
-        # This is the case where you already have allele numbers assigned
-        allele_dict = {}
+        # Read existing allele information from the provided file
         with open(allele_file) as my_known_alleles:
             for line in my_known_alleles:
                 fields = line.split()
-                allele_dict[fields[0]] = fields[1]
-                previous_allele_numbers.append(fields[1])
+                allele_dict.update({fields[0]: fields[1]})
+                allele_count_dict.update({fields[0]: fields[1]})
 
-    # Rename the FASTA file to include the information needed
+    # Rename the FASTA file to include the allele number
     with open(fasta) as my_fasta:
-        genotype_out = open("%s.genotyped.fasta" % file_name, "w")
-        for record in SeqIO.parse(my_fasta, "fasta"):
-            if record.id in passing_records:
-                name_fields = record.id.split("_")
-                sequence = str(record.seq)
-                count = sequence_counts.get(sequence, 0)
-                new_header = "_".join(name_fields[0:-1]) + "_" + file_name + "_C" + str(count)
-                genotype_out.write(">" + str(new_header) + "\n" + str(record.seq) + "\n")
-        genotype_out.close()
+        with open("%s.genotyped.fasta" % file_name, "w") as genotype_out:
+            for record in SeqIO.parse(my_fasta, "fasta"):
+                if record.id in passing_records:
+                    name_fields = record.id.split("_")
+                    sequence = str(record.seq)
 
-    # Overwrite the alleles file to capture any new diversity
-    if "NULL" not in allele_file:
-        newout = open("%s_alleles.tsv" % file_name, "w")
-        for sequence, count in sequence_counts.items():
-            newout.write(str(sequence) + "\t" + str(count) + "\n")
-        newout.close()
+                    if sequence in allele_count_dict:
+                        allele_number = allele_count_dict[sequence]
+                    else:
+                        last_allele = max(allele_count_dict.values())
+                        allele_number = last_allele + 1
+                        allele_count_dict[sequence] = allele_number
 
-def tsv_to_fasta(tsv_file, fasta_file):
-    # Read the TSV file
-    with open(tsv_file, 'r') as file:
-        reader = csv.reader(file, delimiter='\t')
-        data = [(row[0], int(row[1])) for row in reader]
+                    new_header = "_".join(name_fields[0:-1]) + "_" + file_name + "_A" + str(allele_number)
+                    genotype_out.write(">" + str(new_header) + "\n" + sequence + "\n")
 
-    # Sort the alleles by quantity in descending order
-    sorted_data = sorted(data, key=lambda x: x[1], reverse=True)
+        # Update the alleles file with any new alleles
+        if "NULL" not in allele_file:
+            with open("%s_alleles.tsv" % file_name, "w") as newout:
+                for sequence, count in allele_list:
+                    newout.write(sequence + "\t" + str(count) + "\n")
 
-    # Write to the FASTA file
-    with open(fasta_file, 'w') as file:
-        for rank, (sequence, count) in enumerate(sorted_data, start=1):
-            header = f">Allele{rank}_{count}"
-            file.write(f"{header}\n{sequence}\n")
-
-
-               
 def main(fasta_file, min_cov, proportion, alleles):
     passing_records = parse_fasta_by_coverage(fasta_file, min_cov)
     passing_records2 = parse_zygosity(fasta_file, passing_records, proportion)
-    #print(passing_records2)
-    #examples could look like: P3208RsangVaxS50_20017
     allele_list = get_alleles(passing_records2, fasta_file)
-    #print(allele_list)
     assign_alleles(fasta_file, alleles, allele_list, passing_records2)
-    file_name = os.path.basename(fasta_file).replace(".fasta", "_alleles.tsv")
-    output_name = file_name.replace(".tsv", ".fasta")
-    tsv_to_fasta(file_name, output_name)
-    
 
 if __name__ == "__main__":
-    #TODO: bump version when significant changes are made
-    parser = OptionParser(usage="usage: %prog [options]",version="%prog 0.0.3")
-    #First step: make sure it works on a single file
-    parser.add_option("-f","--fasta",dest="fasta",
-                     help="input FASTA file to filter [REQUIRED]",
-                     type="string",action="callback",callback=test_file)
-    parser.add_option("-c","--min_cov",dest="min_cov",
-                     help="filter under minimum coverage; defaults to 10",
-                     type="int",action="store",default=10)
-    parser.add_option("-p","--proportion",dest="proportion",
-                     help="reads under this proportion will be filtered; defaults to 0.5",
-                     type="float",action="store",default=0.5)
-    parser.add_option("-a","--alleles",dest="alleles",
-                     help="TSV file of seuqence'\tprevious_allele_number",
-                     type="string",action="store",default="NULL")
+    parser = OptionParser(usage="usage: %prog [options]", version="%prog 0.0.3")
+    parser.add_option("-f", "--fasta", dest="fasta",
+                      help="input FASTA file to filter [REQUIRED]",
+                      type="string", action="callback", callback=test_file)
+    parser.add_option("-c", "--min_cov", dest="min_cov",
+                      help="filter under minimum coverage; defaults to 10",
+                      type="int", action="store", default=10)
+    parser.add_option("-p", "--proportion", dest="proportion",
+                      help="reads under this proportion will be filtered; defaults to 0.5",
+                      type="float", action="store", default=0.5)
+    parser.add_option("-a", "--alleles", dest="alleles",
+                      help="TSV file of sequence'\t'previous_allele_number",
+                      type="string", action="store", default="NULL")
     options, args = parser.parse_args()
     mandatories = ["fasta"]
     for m in mandatories:
-        if not getattr(options,m,None):
-            print("\nMust provide %s.\n" %m)
+        if not getattr(options, m, None):
+            print("\nMust provide %s.\n" % m)
             parser.print_help()
             exit(-1)
-    main(options.fasta,options.min_cov,options.proportion,options.alleles)
+    main(options.fasta, options.min_cov, options.proportion, options.alleles)
