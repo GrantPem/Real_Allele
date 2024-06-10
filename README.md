@@ -11,9 +11,9 @@
 
 Gene_Exon.fasta (A minimum of 2 fields with underscores is required)
   
--The script will sort and organize by the frequency of an allele in the fasta.
+-The script will sort and organize by the frequency of an allele in the fasta. freqency counts will be included in the two dictionaries created.
   
---a command will use the TSV dictionary file and apply the previous allele naming scheme to the new fasta file, keeping the alleles defined in the dictionary uniform.  
+--a command will use the TSV dictionary file and apply the previous allele naming scheme to the new fasta file, keeping the alleles defined in the dictionary uniform. (Currently needs fixing)
   
 -The sequences within the file also need to be named to this convention:  
 RHIMI-ARA13-xx-DN-020-JB_S86_17441  
