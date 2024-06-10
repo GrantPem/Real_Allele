@@ -12,6 +12,7 @@ from optparse import OptionParser
 import os
 import collections
 import time
+import csv
 
 try:
     from Bio import SeqIO
@@ -187,7 +188,7 @@ def assign_alleles(fasta, allele_file, allele_list, passing_records):
                         allele_number = last_allele + 1
                         allele_count_dict[sequence] = allele_number
 
-                    new_header = "_".join(name_fields[0:-1]) + "_" + file_name + "_A" + str(allele_number)
+                    new_header = "_".join(name_fields[0:-1]) + "_" + file_name + "_" + name_fields[2] + "_A" + str(allele_number)
                     genotype_out.write(">" + str(new_header) + "\n" + sequence + "\n")
 
         # Update the alleles file with any new alleles
@@ -196,11 +197,31 @@ def assign_alleles(fasta, allele_file, allele_list, passing_records):
                 for sequence, count in allele_list:
                     newout.write(sequence + "\t" + str(count) + "\n")
 
+
+def tsv_to_fasta(tsv_file, fasta_file):
+    # Read the TSV file
+    with open(tsv_file, 'r') as file:
+        reader = csv.reader(file, delimiter='\t')
+        data = [(row[0], int(row[1])) for row in reader]
+
+    # Sort the alleles by quantity in descending order
+    sorted_data = sorted(data, key=lambda x: x[1], reverse=True)
+
+    # Write to the FASTA file
+    with open(fasta_file, 'w') as file:
+        for rank, (sequence, count) in enumerate(sorted_data, start=1):
+            header = f">Allele{rank}_{count}"
+            file.write(f"{header}\n{sequence}\n")
+
 def main(fasta_file, min_cov, proportion, alleles):
     passing_records = parse_fasta_by_coverage(fasta_file, min_cov)
     passing_records2 = parse_zygosity(fasta_file, passing_records, proportion)
     allele_list = get_alleles(passing_records2, fasta_file)
     assign_alleles(fasta_file, alleles, allele_list, passing_records2)
+    file_name = fasta_file.replace(".fasta", "_alleles.tsv")
+    output_name = file_name.replace("tsv", "fasta")
+    tsv_to_fasta(file_name, output_name)  # Pass the actual variable names
+    
 
 if __name__ == "__main__":
     parser = OptionParser(usage="usage: %prog [options]", version="%prog 0.0.3")
