@@ -26,4 +26,6 @@ python allele_driver.py -f TEST_V1.fasta
 python allele_driver.py -f TEST_V2.fasta -a TEST_V1_alleles.tsv  
 Help command python allele_driverV5.py -h   
 
+
+- allele_driverV5.py is the version of the script used in this publication: https://www.sciencedirect.com/science/article/pii/S1877959X24000372
  
