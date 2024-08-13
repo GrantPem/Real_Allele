@@ -6,7 +6,7 @@
   
 - Sequencing artifacts will be filtered out based on a criterion of zygosity proportion, and minimum read count.  
 
-- Alleles are assigned based on their frequency, allele 1 will be assigned to the most common allele  
+- Alleles are assigned based on their frequency, allele 1 will be assigned to the most common allele.  
 - Creates a TSV dictionary file containing sequences and their counts.
 
   
@@ -14,10 +14,10 @@
 - The sequences within the file also need to be named to this convention:  
 RHIMI-ARA13-xx-DN-020-JB_S86_17441  
 "RHIMI-," "-xx-DN-020-JB", "-xx-VE-020-JB" will be removed.  
-ARA13 is the sample name  
-17441 is the read count 
+ARA13 is the sample name.  
+17441 is the read count. 
 This assumes three fields, all separated by "_," with the last field being the read count.  
-The output name will have five elements: ARA13_AQP1_E0101_17441_A1  
+The output name will have five elements: ARA13_AQP1_E0101_17441_A1.  
   
   
 - Test files are included with the repository. First, run the script on an initial file:  
