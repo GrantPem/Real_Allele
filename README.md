@@ -20,7 +20,7 @@ This assumes three fields, all separated by "_," with the last field being the r
 The output name will have five elements: ARA13_AQP1_E0101_17441_A1  
   
   
--Test files are included with the repository. First, run the script on an initial file:  
+- Test files are included with the repository. First, run the script on an initial file:  
 python allele_driver.py -f TEST_V1.fasta  
 --a command will use the TSV dictionary file and apply the previous allele naming scheme to the new fasta file, keeping the alleles defined in the dictionary uniform:  
 python allele_driver.py -f TEST_V2.fasta -a TEST_V1_alleles.tsv  
