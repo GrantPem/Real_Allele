@@ -169,7 +169,7 @@ def assign_alleles(fasta, allele_file, allele_list, passing_records):
                         allele_number = f"A{next_allele_number}"
                         allele_count_dict[sequence] = allele_number
                         next_allele_number += 1
-                    new_header = "_".join(name_fields[0:-1]) + f"_{allele_number}"
+                    new_header = "_".join(name_fields[0:-1]) + "_" + name_fields[2] + f"_{allele_number}"
                     genotype_out.write(f">{new_header}\n{sequence}\n")
 
 
@@ -178,12 +178,84 @@ def assign_alleles(fasta, allele_file, allele_list, passing_records):
                 for sequence, count in allele_list:
                     newout.write(f"{sequence}\t{count}\n")
 
+
+def create_excel_compatible_output(fasta_file, passing_records, allele_list):
+    # Define the output filename
+    file_name = fasta_file.replace(".fasta", "_genotype_table.tsv")
+    ho = 0
+    he = 0
+    # Sort alleles by frequency to assign rankings (A1, A2, etc.)
+    allele_ranking = {sequence: f"A{idx + 1}" for idx, (sequence, _) in enumerate(allele_list)}
+
+    # Dictionary to hold sequence information
+    sequence_data = {}
+
+    # Populate sequence data with allele assignments and read counts
+    with open(fasta_file) as my_fasta:
+        for record in SeqIO.parse(my_fasta, "fasta"):
+            if record.id in passing_records:
+                sequence = str(record.seq)
+                read_count = int(record.id.split("_")[-1])
+                name = "_".join(record.id.split("_")[:-1])
+
+                # Add to sequence_data if new or update for duplicates
+                if name not in sequence_data:
+                    ho = ho + 1
+                    sequence_data[name] = {
+                        'name': name,
+                        'read_count1': read_count,
+                        'assigned_allele': allele_ranking[sequence],
+                        'read_count2': read_count,
+                        'assigned_allele2': allele_ranking[sequence]
+                    }
+                else:
+                    # If it's a duplicate, assign it to the second allele if it has a lower read count
+                    if read_count < sequence_data[name]['read_count1']:
+                        sequence_data[name]['read_count2'] = read_count
+                        sequence_data[name]['assigned_allele2'] = allele_ranking[sequence]
+                        he = he + 1
+                    else:
+                        # Move the current read count 1 and assigned allele to read count 2 and allele 2
+                        sequence_data[name]['read_count2'] = sequence_data[name]['read_count1']
+                        sequence_data[name]['assigned_allele2'] = sequence_data[name]['assigned_allele']
+                        
+                        # Update read count 1 and assigned allele with the new higher read count sequence
+                        sequence_data[name]['read_count1'] = read_count
+                        sequence_data[name]['assigned_allele'] = allele_ranking[sequence]
+
+
+    # Write ratio of homozygotes compared to heterozygotes
+    text_name = fasta_file.replace(".fasta", "_homogeneity.txt")
+    rate = (he/ho)*100
+    f = open(text_name, "w")
+    f.write(f"Homozygotes: {ho} \n")
+    f.write(f"Heterozygote: {he} \n")
+    f.write(f"Hetozygosity Percentage: {round(rate,2)} \n")
+    
+    # Write to an Excel-compatible TSV file
+    with open(file_name, "w", newline='') as outfile:
+        writer = csv.writer(outfile, delimiter='\t')
+        # Write the header
+        writer.writerow(["Name of the sequence", "Read count 1", "Assigned allele", 
+                         "Read count 2", "Assigned second allele"])
+        
+        # Write each sequence's details
+        for data in sequence_data.values():
+            writer.writerow([
+                data['name'],
+                data['read_count1'],
+                data['assigned_allele'],
+                data['read_count2'],
+                data['assigned_allele2']
+            ])
+
 def main(fasta_file, min_cov, proportion, alleles):
     passing_records = parse_fasta_by_coverage(fasta_file, min_cov)
     passing_records2 = parse_zygosity(fasta_file, passing_records, proportion)
     allele_list = get_alleles(passing_records2, fasta_file)
 
     assign_alleles(fasta_file, alleles, allele_list, passing_records2)
+    create_excel_compatible_output(fasta_file, passing_records2, allele_list)
 
     file_name = fasta_file.replace(".fasta", "_frequency.tsv")
     with open(file_name, "w") as freq_out:
