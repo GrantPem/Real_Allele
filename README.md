@@ -4,7 +4,9 @@
 - The Real_Allele Script is designed to determine allele frequencies and assign allele numbers from a consensus FASTA file containing DNA sequences.  
   
   
-- Sequencing artifacts will be filtered out based on a criterion of zygosity proportion, and minimum read count.  
+- Sequencing artifacts will be filtered out based on a criterion of zygosity proportion, and minimum read count.
+  
+- Samples with more than two alleles will filter out the sequences with alleles lower than the top two read counts.
 
 - Alleles are assigned based on their frequency, allele 1 will be assigned to the most common allele.  
 - Creates a TSV dictionary file containing sequences and their counts.
@@ -26,6 +28,13 @@ python allele_driver.py -f TEST_V1.fasta
 python allele_driver.py -f TEST_V2.fasta -a TEST_V1_alleles.tsv  
 Help command python allele_driverV5.py -h   
 
+# Rare_Allele 
+-Uses biopython version 1.81
 
+- The Rare_Allele Script is designed to determine allele frequencies and assign allele numbers from a consensus FASTA file containing DNA sequences while still retaining all sequences that pass the filter.
+
+- Can have an indefinite number of possible alleles assigned to one sample  
+
+# Real_Allele 5
 - allele_driverV5.py is the version of the script used in this publication: https://www.sciencedirect.com/science/article/pii/S1877959X24000372
  
